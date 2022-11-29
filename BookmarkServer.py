@@ -29,8 +29,6 @@ form = '''<!DOCTYPE html>
 </pre>
 '''
 
-class ThreadHTTPServer(ThreadingMixIn, http.server.HTTPServer):
-    "This is an HTTPServer that supports thread-based concurrency."
 def CheckURI(uri, timeout=5):
     '''Check whether this URI is reachable, i.e. does it return a 200 OK?
     
@@ -99,6 +97,11 @@ class Shortener(http.server.BaseHTTPRequestHandler):
             self.wfile.write(
                 "Couldn't fetch URI '{}'. Sorry!".format(longuri).encode())
 
+
+
+class ThreadHTTPServer(ThreadingMixIn, http.server.HTTPServer):
+    "This is an HTTPServer that supports thread-based concurrency."
+    
 if __name__ == '__main__':
     port = ('', int(os.environ.get('PORT', '8000')))
     server_address = ('', port)
