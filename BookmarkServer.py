@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 #
 # A *bookmark server* or URI shortener.
-
+import threading
+from socketserver import ThreadingMixIn
 import http.server
 import requests
 import os
@@ -28,7 +29,8 @@ form = '''<!DOCTYPE html>
 </pre>
 '''
 
-
+class ThreadHTTPServer(ThreadingMixIn, http.server.HTTPServer):
+    "This is an HTTPServer that supports thread-based concurrency."
 def CheckURI(uri, timeout=5):
     '''Check whether this URI is reachable, i.e. does it return a 200 OK?
     
@@ -98,6 +100,7 @@ class Shortener(http.server.BaseHTTPRequestHandler):
                 "Couldn't fetch URI '{}'. Sorry!".format(longuri).encode())
 
 if __name__ == '__main__':
-    server_address = ('', int(os.environ.get('PORT', '8000')))
-    httpd = http.server.HTTPServer(server_address, Shortener)
+    port = ('', int(os.environ.get('PORT', '8000')))
+    server_address = ('', port)
+    httpd = ThreadHTTPServer(server_address, Shortener)
     httpd.serve_forever()
